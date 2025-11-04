@@ -90,18 +90,27 @@ public class OrderServiceImpl implements OrderService {
 	public OrderResponseDto updateOrder(Long id, OrderUpdateDto orderUpdateDto) {
 		Order order = orderRepo.findById(id).orElseThrow(() -> new OrderNotFoundException(id));
 		List<OrderProduct> productsFromDb = order.getProducts();
+		orderMapper.updateOrderFromDto(orderUpdateDto, order);
 		for (OrderProductDto productDto : orderUpdateDto.getProducts()) {
 			Optional<OrderProduct> orderProduct = productsFromDb.stream()
 					.filter(p -> p.getProductId().equals(productDto.getProductId())).findFirst();
 			if (orderProduct.isPresent()) {
-				orderMapper.updateOrderProductFromDto(productDto, orderProduct.get());
+				OrderProduct existingProduct = orderProduct.get();
+				Long diff = productDto.getQuantity() - existingProduct.getQuantity();
+				orderMapper.updateOrderProductFromDto(productDto, existingProduct);
+				if(diff > 0) {
+				  productClient.reduceStock(productDto.getProductId(), diff);
+				}else {
+			      productClient.restoreStock(productDto.getProductId(), -diff);
+				}
 			} else {
 				OrderProduct op = new OrderProduct();
 				orderMapper.updateOrderProductFromDto(productDto, op);
 				order.addProduct(op);
+				productClient.reduceStock(productDto.getProductId(), productDto.getQuantity());
 			}
 		}
-		orderMapper.updateOrderFromDto(orderUpdateDto, order);
+		
 		BigDecimal totalAmount = order.getProducts().stream().map(p -> productClient.getProductById(p.getProductId())
 				.getPrice().multiply(BigDecimal.valueOf(p.getQuantity()))).reduce(BigDecimal.ZERO, BigDecimal::add);
 		order.setTotalAmount(totalAmount);

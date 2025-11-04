@@ -25,7 +25,7 @@ public class ProductClient {
 	}
 
 	public boolean reduceStock(Long productId, Long quantity) {
-		return webClient.get()
+		return webClient.put()
 				.uri(uriBuilder -> uriBuilder.path("/{id}/reduce-stock").queryParam("quantity", quantity)
 						.build(productId))
 				.retrieve().toBodilessEntity() // converts response to ResponseEntity<Void>
@@ -33,8 +33,9 @@ public class ProductClient {
 				.block();
 	}
 	
+	
 	public boolean restoreStock(Long productId, Long quantity) {
-		return webClient.get()
+		return webClient.put()
 				.uri(uriBuilder -> uriBuilder.path("/{id}/restore-stock").queryParam("quantity", quantity)
 						.build(productId))
 				.retrieve().toBodilessEntity() // converts response to ResponseEntity<Void>
