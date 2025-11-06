@@ -1,5 +1,7 @@
 package com.example.orderservice.webclient;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -14,8 +16,8 @@ public class ProductClient {
 		this.webClient = builder.baseUrl("http://localhost:8082/api/products").build();
 	}
 
-	public ProductDto getProductById(Long productId) {
-		return webClient.get().uri("/{id}", productId).retrieve().bodyToMono(ProductDto.class).block();
+	public List<ProductDto> getProductsByIds(List<Long> ids) {
+		return webClient.post().uri("/batch").bodyValue(ids).retrieve().bodyToFlux(ProductDto.class).collectList().block();
 	}
 
 	public boolean isAvailable(Long productId, Long quantity) {
