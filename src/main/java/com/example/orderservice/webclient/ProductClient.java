@@ -13,7 +13,7 @@ public class ProductClient {
 	private final WebClient webClient;
 
 	public ProductClient(WebClient.Builder builder) {
-		this.webClient = builder.baseUrl("http://localhost:8082/api/products").build();
+		this.webClient = builder.baseUrl("http://product-service:8082/api/products").build();
 	}
 
 	public List<ProductDto> getProductsByIds(List<Long> ids) {
