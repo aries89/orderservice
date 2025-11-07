@@ -3,7 +3,8 @@ package com.example.orderservice.exceptions;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import org.springframework.http.HttpStatusCode;
+import org.springframework.http.HttpStatus;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,12 +15,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ErrorResponse {
 	
-	private HttpStatusCode status;
+	private HttpStatus status;
     private String message;
     private LocalDateTime timestamp;
     private List<String> errors;
     
-    public ErrorResponse(HttpStatusCode status, String message, LocalDateTime timestamp) {
+    public ErrorResponse(HttpStatus status, String message, LocalDateTime timestamp) {
         this.status = status;
         this.message = message;
         this.timestamp = timestamp;
